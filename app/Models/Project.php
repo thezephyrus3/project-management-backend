@@ -9,6 +9,7 @@ class Project extends Model
 {
     protected $fillable = [
         'name',
+        'user_id',
         'description',
         'due_date',
     ];
@@ -16,5 +17,10 @@ class Project extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

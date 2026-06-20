@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -13,7 +14,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        return response()->json(Project::all(), 200);
+        return response()->json(Auth::user()->projects, 200);
     }
 
     /**
@@ -22,7 +23,7 @@ class ProjectController extends Controller
     public function store(ProjectRequest $request)
     {
 
-        $project = Project::create($request->validated());
+        $project = Auth::user()->projects()->create($request->validated());
 
         return response()->json($project, 201);
     }
@@ -32,6 +33,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
+        $this->authorize('view', $project);
+
         return response()->json($project, 200);
     }
 
@@ -41,9 +44,9 @@ class ProjectController extends Controller
     public function update(ProjectRequest $request, Project $project)
     {
 
-        $project->update($request->validated());
+        $this->authorize('update', $project);
 
-        return response()->json($project, 200); // 200 OK
+        return response()->json($project, 200);
     }
 
     /**
@@ -51,10 +54,10 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $project->query()->delete();
+        $this->authorize('delete', $project);
 
         return response()->json([
             'message' => 'Project succesfully deleted',
-        ]); // No content
+        ]);
     }
 }

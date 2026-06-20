@@ -14,6 +14,8 @@ class TaskController extends Controller
      */
     public function index(Project $project)
     {
+        $this->authorize('view', $project);
+
         $tasks = $project->tasks;
 
         return response()->json($tasks, 200);
@@ -24,6 +26,8 @@ class TaskController extends Controller
      */
     public function store(TaskRequest $request, Project $project)
     {
+        $this->authorize('update', $project);
+
         $task = $project->tasks()->create($request->validated());
 
         return response()->json($task, 201);
@@ -34,6 +38,8 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        $this->authorize('view', $task);
+
         return response()->json($task->load('project'), 200);
     }
 
@@ -42,6 +48,8 @@ class TaskController extends Controller
      */
     public function update(TaskRequest $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $task->update($request->validated());
 
         return response()->json($task, 200);
@@ -52,7 +60,9 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $task->query()->delete();
+        $this->authorize('delete', $task);
+
+        $task->delete();
 
         return response()->json([
             'message' => 'Task succesfully deleted',
